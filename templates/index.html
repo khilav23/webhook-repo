@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>GitHub Event Viewer</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            border-radius: 5px;
+        }
+
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        #events {
+            list-style: none;
+            padding: 0;
+        }
+
+        .event-item {
+            background-color: #fafafa;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background-color 0.3s ease;
+        }
+
+        .event-item:hover {
+            background-color: #f0f0f0;
+        }
+
+        .event-type {
+            font-weight: bold;
+            color: #fff;
+            padding: 5px 10px;
+            border-radius: 3px;
+            text-transform: uppercase;
+            font-size: 0.8em;
+        }
+
+        .push {
+            background-color: #007bff; /* Blue */
+        }
+
+        .pull-request {
+            background-color: #28a745; /* Green */
+        }
+
+        .merge {
+            background-color: #6f42c1; /* Purple */
+        }
+
+        .event-details {
+            font-size: 0.9em;
+            color: #555;
+        }
+
+        .event-author {
+            font-weight: bold;
+        }
+
+        .event-branch {
+            font-family: monospace;
+            background-color: #eee;
+            padding: 2px 5px;
+            border-radius: 3px;
+        }
+
+        .event-timestamp {
+            font-size: 0.8em;
+            color: #777;
+        }
+
+        .loading {
+            text-align: center;
+            font-style: italic;
+            color: #777;
+        }
+
+        .error {
+            text-align: center;
+            color: #dc3545; 
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>GitHub Events</h1>
+        <div id="loading" class="loading">Loading events...</div>
+        <div id="error" class="error" style="display: none;"></div>
+        <ul id="events"></ul>
+    </div>
+
+    <script>
+        const eventsList = document.getElementById('events');
+        const loadingIndicator = document.getElementById('loading');
+        const errorContainer = document.getElementById('error');
+
+        function fetchEvents() {
+            loadingIndicator.style.display = 'block';
+            errorContainer.style.display = 'none';
+
+            fetch('/events')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(events => {
+                    eventsList.innerHTML = ''; 
+
+                    if (events.length === 0) {
+                        const li = document.createElement('li');
+                        li.textContent = 'No events found.';
+                        eventsList.appendChild(li);
+                        return;
+                    }
+
+                    events.forEach(event => {
+                        const li = document.createElement('li');
+                        li.classList.add('event-item');
+
+                        const eventTypeSpan = document.createElement('span');
+                        eventTypeSpan.classList.add('event-type');
+                        eventTypeSpan.textContent = event.action.replace('_', ' ');
+
+                        if (event.action === 'PUSH') {
+                            eventTypeSpan.classList.add('push');
+                        } else if (event.action === 'PULL_REQUEST') {
+                            eventTypeSpan.classList.add('pull-request');
+                        } else if (event.action === 'MERGE') {
+                            eventTypeSpan.classList.add('merge');
+                        }
+
+                        const detailsDiv = document.createElement('div');
+                        detailsDiv.classList.add('event-details');
+
+                        let detailsText = '';
+                        if (event.action === 'PUSH') {
+                            detailsText = `<span class="event-author">${event.author}</span> pushed to <span class="event-branch">"${event.to_branch}"</span>`;
+                        } else if (event.action === 'PULL_REQUEST') {
+                            detailsText = `<span class="event-author">${event.author}</span> submitted a pull request from <span class="event-branch">"${event.from_branch}"</span> to <span class="event-branch">"${event.to_branch}"</span>`;
+                        } else if (event.action === 'MERGE') {
+                            detailsText = `<span class="event-author">${event.author}</span> merged branch <span class="event-branch">"${event.from_branch}"</span> into <span class="event-branch">"${event.to_branch}"</span>`;
+                        }
+
+                        detailsDiv.innerHTML = detailsText;
+
+                        const timestampSpan = document.createElement('span');
+                        timestampSpan.classList.add('event-timestamp');
+                        timestampSpan.textContent = new Date(event.timestamp).toLocaleString();
+
+                        li.appendChild(eventTypeSpan);
+                        li.appendChild(detailsDiv);
+                        li.appendChild(timestampSpan);
+                        eventsList.appendChild(li);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error fetching events:', error);
+                    errorContainer.textContent = `Error fetching events: ${error.message}`;
+                    errorContainer.style.display = 'block';
+                })
+                .finally(() => {
+                    loadingIndicator.style.display = 'none';
+                });
+        }
+
+        // Fetch events initially and then every 15 seconds, adjust as needed
+        fetchEvents();
+        setInterval(fetchEvents, 15000);
+    </script>
+</body>
+</html>
