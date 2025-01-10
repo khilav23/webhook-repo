@@ -27,6 +27,9 @@ This project is a solution to the following problem statement:
 
 This repository (`webhook-repo`) implements the webhook endpoint and UI, while a separate repository (`action-repo`) is used to trigger the GitHub events.
 
+## Planned Improvements:
+I'm planning to add websockets in order to stop polling and maintain a persistent connection. This will let me see live changes as they happen in the repo. 
+
 ## Features
 
 *   **Webhook Endpoint:** A Flask-based webhook endpoint (`/webhook`) that receives GitHub webhook events.
