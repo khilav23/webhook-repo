@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, render_template  # Import render_template
+from flask import Flask, request, jsonify, render_template  
 from pymongo import MongoClient
 import os
 import datetime
@@ -8,7 +8,9 @@ import hashlib
 app = Flask(__name__)
 
 # MongoDB Config
-mongo_uri = "mongodb://localhost:27017"
+# mongo_uri = "mongodb://localhost:27017"
+mongo_uri = "mongodb://host.docker.internal:27017/"
+
 client = MongoClient(mongo_uri)
 db = client["github_actions"]  
 collection = db["Tstax-A"]  
@@ -91,4 +93,3 @@ def index():
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)
-    
