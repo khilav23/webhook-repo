@@ -27,6 +27,9 @@ This project is a solution to the following problem statement:
 
 This repository (`webhook-repo`) implements the webhook endpoint and UI, while a separate repository (`action-repo`) is used to trigger the GitHub events.
 
+## Planned Improvements:
+I'm planning to add websockets in order to stop polling and maintain a persistent connection. This will let me see live changes as they happen in the repo. 
+
 ## Features
 
 *   **Webhook Endpoint:** A Flask-based webhook endpoint (`/webhook`) that receives GitHub webhook events.
@@ -151,14 +154,7 @@ This repository (`webhook-repo`) implements the webhook endpoint and UI, while a
 *   **`requirements.txt`:** Lists the required Python packages.
 *   **`.env`:** Stores environment variables (MongoDB connection string, webhook secret).
 
-## Further Improvements
 
-*   **Enhanced UI:** Consider using a frontend framework like React to create a more dynamic and interactive UI.
-*   **Real-time Updates:** Implement WebSockets (e.g., using SocketIO) to push updates to the UI in real-time instead of relying solely on polling.
-*   **Authentication:** Add authentication to protect the `/events` endpoint.
-*   **More Robust Error Handling:** Implement more comprehensive error handling and logging.
-*   **Deployment:** Deploy the application to a production server (e.g., Heroku, AWS, DigitalOcean) for a more permanent setup.
-*   **Automated Tests:** Write unit and integration tests to ensure code quality and prevent regressions.
 
 ## Related Repository
 
